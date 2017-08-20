@@ -29,6 +29,11 @@ if (isset($_POST['submit']))
 							$_SESSION['username'] = $us_user;
 							$_SESSION['id'] = $us_id;	
 							$_SESSION['status']	= $us_status;
+							
+//Generate a secure token using openssl_random_pseudo_bytes.
+$myToken = bin2hex(openssl_random_pseudo_bytes(24));
+//Store the token as a session variable.
+$_SESSION['token'] = $myToken;
 							header('Location: index.php');
 
 

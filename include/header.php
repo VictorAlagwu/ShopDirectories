@@ -14,7 +14,7 @@
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
 	
 	 <!-- Bootstrap CSS================================= -->
-	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
 	
 </head>
 <body>
@@ -31,8 +31,7 @@
 
 	                <?php if(isset($_SESSION['username'])){?>
 	                <!--Only show when a user is login-->
-	                <li class="nav-item "><a class="nav-link" href="logout.php">Logout</a></li>
-
+	                <li class="nav-item "><a class="nav-link" href="logout.php?token=<?= $_SESSION['token']; ?>">Logout</a></li>
 	                <?php }else{?> 
 	                <!--Only show when a user is not login-->
 	                <li class="nav-item "><a class="nav-link" href="login.php">Login</a></li>

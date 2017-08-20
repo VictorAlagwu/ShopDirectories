@@ -1,6 +1,7 @@
 <?php $title= "Welcome Page"; ?>
 
 <?php include "include/header.php"; ?>
+
 <div class="container"> 
 	<div class="row jumbotron">
 		<div class="">

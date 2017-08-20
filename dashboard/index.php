@@ -40,45 +40,54 @@ $user_name = $_SESSION['username'];
 	        <div class="collapse navbar-collapse" id="navbarNav" class="navbar-toggler navbar-toggler-right">
 	            <ul class="navbar-nav mr-auto mt-2 mt-md-0">
 	                <li class="nav-item active"><a class="nav-link" href="../index.php">Vist Site</a></li>
-	                <li class="nav-item "><a class="nav-link" href="../logout.php">Logout</a></li>       
+	                <li class="nav-item "><a class="nav-link"  href="../logout.php?token=<?= $_SESSION['token']; ?>">Logout</a></li>       
 	    		</ul>
 			</div>		
     </nav><!--/nav-->
+
+
+   <!--PHP CODE TO ADD NEW STORE AND IT DETAILS ======= --> 
 <?php 
-
-
-if (isset($_POST['add'])) {
+	if (isset($_POST['add'])) {
 	
-	$store_name =  strip_tags($_POST['store_name']);
-	$store_address =  strip_tags($_POST['store_address']);
-	try{
+			$store_name =  strip_tags($_POST['store_name']);
+			$store_address =  strip_tags($_POST['store_address']);
+			
+				if (!isset($_POST['token'])){
+			    	throw new Exception('No token found!');
+				}
+			 //Compare session token with post token
+				if(strcasecmp($_POST['token'], $_SESSION['token']) != 0){
+				    throw new Exception('Token mismatch!');
+				}
+			try{
 
-		$add_store = "INSERT INTO stores (store_name,store_address,user_id,time_created) VALUES (:store_name,:store_address,:user_id,now())";
+				$add_store = "INSERT INTO stores (store_name,store_address,user_id,time_created) VALUES (:store_name,:store_address,:user_id,now())";
 
-		$add_stmt = $con->prepare($add_store);
-		$add_stmt->bindParam(':store_name', $store_name);
-		$add_stmt->bindParam(':store_address', $store_address);
-		$add_stmt->bindParam(':user_id', $user_name);
-		
+				$add_stmt = $con->prepare($add_store);
+				$add_stmt->bindParam(':store_name', $store_name);
+				$add_stmt->bindParam(':store_address', $store_address);
+				$add_stmt->bindParam(':user_id', $user_name);
+				
 
-		$add_stmt->execute();
-		echo "Added Succefully";
-		header('Location:index.php');
-		
-	}catch(PDOException $e){
-		die($e->getMessage());
+				$add_stmt->execute();
+				echo "Added Succefully";
+				header('Location:index.php');
+				
+			}catch(PDOException $e){
+				die($e->getMessage());
+			}
 	}
-
-
-}
 ?>
 <div class="container">
+
+<!--JUMBOTRON=========-->
 	<div class="row jumbotron">
-		<div class="">
 			<h2 class="display-3">User Dashboard</h2>
-			<p class="lead">It contains all the different stores</p>
-		</div>
+			<p class="lead">Allow User to enter their own store details</p>
 	</div>
+
+
 	<div class="row">
 		<div class="col-lg-5 col-md-12 col-sm-12">
 			<h2>ADD STORE</h2>
@@ -87,10 +96,14 @@ if (isset($_POST['add'])) {
                        <label for="cat_title">Store Name</label>
                         <input type="text" name="store_name"  class="form-control">
                     </div>
-                  
+                    <div>
+                    	<!--Hidden field containing our session token-->
+   					 <input type="hidden" name="token" value="<?= $_SESSION['token']; ?>">
+                    </div>
+                  	
                     <div class="form-group">
                         <label>Store Address</label>
-                            <input type="text" name="store_address" class="form-control"></input>
+                        <input type="text" name="store_address" class="form-control"></input>
                     </div>
                     <div class="form-group text-center">
                     	<button name="add" class="btn btn-light" type="submit">ADD STORE</button>
@@ -98,6 +111,10 @@ if (isset($_POST['add'])) {
           		</form>
 
 
+
+
+
+<!--UPDATING SECTION ========-->
           		<?php
 if (isset($_GET['edit'])) {
 	$store_id = $_GET['edit'];
@@ -159,7 +176,7 @@ if (isset($_GET['edit'])) {
 			  }
 		}else{
 			echo "<script>alert('Sorry, can only be modify by user who created it');</script>";
-			// header('Location:error.php');
+			
 	
 		}
 
@@ -168,7 +185,7 @@ if (isset($_GET['edit'])) {
 }
           	?>
 
-
+<!-- /UPDATING SECTION-==========-->
 
 
 		</div>
@@ -219,10 +236,12 @@ if (isset($_GET['del'])) {
 		$store_id = $_GET['del'];
 
 		if ($us_status != "Admin") {
+			
 				echo "<script>alert('Sorry, Only Admins can delete any data');</script>";
 				header('Location:../error.php');
 		}else{
-			$delete_query = "DELETE FROM stores WHERE id = :store_id ";
+
+		$delete_query = "DELETE FROM stores WHERE id = :store_id ";
 		$delete_stmt = $con->prepare($delete_query);
 		$delete_stmt->bindParam(':store_id',$store_id);
 		$delete_stmt->execute();
@@ -245,7 +264,7 @@ if (isset($_GET['del'])) {
 
 
 
-   <!-- Bootstrap JavaScript================================= -->
+   <!--  JavaScript Files ================================= -->
   	
   	<script src="../assets/js/jquery.min.js"></script>
   	<script src="../assets/js/umd/popper.min.js"></script>
