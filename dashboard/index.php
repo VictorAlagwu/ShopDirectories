@@ -15,7 +15,7 @@ $user_name = $_SESSION['username'];
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="Victor Alagwu" content="">
 	
 	<title><?php echo $title; ?></title>
  	 
@@ -71,11 +71,6 @@ if (isset($_POST['add'])) {
 
 
 }
-
-
-
-
-
 ?>
 <div class="container">
 	<div class="row jumbotron">
@@ -97,10 +92,12 @@ if (isset($_POST['add'])) {
                         <label>Store Address</label>
                             <input type="text" name="store_address" class="form-control"></input>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group text-center">
                     	<button name="add" class="btn btn-light" type="submit">ADD STORE</button>
                     </div>
           		</form>
+
+
           		<?php
 if (isset($_GET['edit'])) {
 	$store_id = $_GET['edit'];
@@ -109,10 +106,10 @@ if (isset($_GET['edit'])) {
 	$stmt->bindParam(':store_id', $store_id);
 	$stmt->execute();
 	while ($row = $stmt->fetch()) {
-		$store_name = $row['store_name'];
-		$store_address = $row['store_address'];
-		$user_id = $row['user_id'];
-		$time_created = $row['time_created'];
+		$store_name = htmlentities($row['store_name']) ;
+		$store_address = htmlentities($row['store_address']);
+		$user_id = htmlentities($row['user_id']);
+		$time_created = htmlentities($row['time_created']);
 
 		if ($user_name == $user_id) {		
 		?>
@@ -128,7 +125,7 @@ if (isset($_GET['edit'])) {
                         <label>Store Address</label>
                             <input type="text" name="s_address" class="form-control" value="<?php echo $store_address; ?>"></input>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group text-center">
                     	<button name="update" class="btn btn-light" type="submit">UPDATE STORE</button>
                     </div>
           		</form>
@@ -196,12 +193,12 @@ $s_query = "SELECT * FROM stores";
 $s_stmt = $con->prepare($s_query);
 $s_stmt->execute();
 while ($s_row = $s_stmt->fetch()) {
-	$s_id = $s_row['id'];
-	$s_name = $s_row['store_name'];
-	$s_address = $s_row['store_address'];
-	$s_user = $s_row['user_id'];
-	$s_time_update = $s_row['time_updated'];
-	$s_time_create = $s_row['time_created'];
+	$s_id =htmlentities($s_row['id']); 
+	$s_name =htmlentities($s_row['store_name']) ;
+	$s_address = htmlentities($s_row['store_address']);
+	$s_user = htmlentities($s_row['user_id']);
+	$s_time_update = htmlentities($s_row['time_updated']);
+	$s_time_create = htmlentities($s_row['time_created']);
 
 
 
@@ -223,7 +220,7 @@ if (isset($_GET['del'])) {
 
 		if ($us_status != "Admin") {
 				echo "<script>alert('Sorry, Only Admins can delete any data');</script>";
-				header('Location:index.php');
+				header('Location:../error.php');
 		}else{
 			$delete_query = "DELETE FROM stores WHERE id = :store_id ";
 		$delete_stmt = $con->prepare($delete_query);

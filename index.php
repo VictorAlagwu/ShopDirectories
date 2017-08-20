@@ -14,10 +14,10 @@
 $query = "SELECT * FROM stores";
 
 foreach ($con->query($query) as $row) {
-	$store_name = $row['store_name'];
-	$store_address = $row['store_address'];
-	$store_user = $row['user_id'];
-	$time_updated = $row['time_updated'];
+	$store_name = htmlentities($row['store_name']);
+	$store_address = htmlentities($row['store_address']) ;
+	$store_user = htmlentities($row['user_id']);
+	$time_updated = htmlentities($row['time_updated']);
 
 
 
