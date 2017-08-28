@@ -1,10 +1,10 @@
-<?php require '../database/connection.php'; ?>
 <?php $title='User Page'; ?>
-
+<?php require 'class.dashboard.php';?>
+<?php $user_db = new Dashboard();?>
 <?php
  if(isset($_SESSION['username'])) 
  {
- 	
+$us_status = $_SESSION['role']; 	
 $user_name = $_SESSION['username'];
  ?>
 
@@ -60,23 +60,13 @@ $user_name = $_SESSION['username'];
 				if(strcasecmp($_POST['token'], $_SESSION['token']) != 0){
 				    throw new Exception('Token mismatch!');
 				}
-			try{
-
-				$add_store = "INSERT INTO stores (store_name,store_address,user_id,time_created) VALUES (:store_name,:store_address,:user_id,now())";
-
-				$add_stmt = $con->prepare($add_store);
-				$add_stmt->bindParam(':store_name', $store_name);
-				$add_stmt->bindParam(':store_address', $store_address);
-				$add_stmt->bindParam(':user_id', $user_name);
+				if ($user_db->addStore($store_name,$store_address,$user_name)) {
+					header('Location:index.php');
+				}else{
+					echo "Incorrect Data";
+				}
 				
-
-				$add_stmt->execute();
-				echo "Added Succefully";
-				header('Location:index.php');
-				
-			}catch(PDOException $e){
-				die($e->getMessage());
-			}
+			
 	}
 ?>
 <div class="container">
@@ -119,7 +109,7 @@ $user_name = $_SESSION['username'];
 if (isset($_GET['edit'])) {
 	$store_id = $_GET['edit'];
 	$query = "SELECT * FROM stores WHERE id = :store_id";
-	$stmt = $con-> prepare($query);
+	$stmt = $user_db->viewEdit($query);
 	$stmt->bindParam(':store_id', $store_id);
 	$stmt->execute();
 	while ($row = $stmt->fetch()) {
@@ -153,23 +143,11 @@ if (isset($_GET['edit'])) {
 			if (isset($_POST['update'])) {
 				$s_name = strip_tags($_POST['s_name']);
 				$s_address = strip_tags($_POST['s_address']);
-		try {
-			$edit_q = "UPDATE stores SET store_name = :s_name, store_address = :s_address, user_id = :user_name,time_updated=now(), time_created = :time_created WHERE id = :store_id";
-
-					$edit_stmt = $con->prepare($edit_q);
-					$edit_stmt->bindParam(':s_name',$s_name);
-					$edit_stmt->bindParam(':s_address',$s_address);
-					$edit_stmt->bindParam(':user_name',$user_name);
-					$edit_stmt->bindParam(':store_id',$store_id);
-					$edit_stmt->bindParam(':time_created',$time_created);
-
-					$edit_stmt->execute();
-
-					header('Location:index.php');
-		} catch (PDOException $e) {
-			die($e->getMessage());
-		}
-					
+					if ($user_db->editStore($s_name,$s_address,$user_name,$store_id,$time_created)) {
+							header('Location:index.php');
+						}else{
+							echo "Invalid Entries";
+						}	
 				
 				
 				
@@ -207,7 +185,7 @@ if (isset($_GET['edit'])) {
 	                <tbody>
 	                <?php
 $s_query = "SELECT * FROM stores";
-$s_stmt = $con->prepare($s_query);
+$s_stmt = $user_db->viewStore($s_query);
 $s_stmt->execute();
 while ($s_row = $s_stmt->fetch()) {
 	$s_id =htmlentities($s_row['id']); 
@@ -242,7 +220,7 @@ if (isset($_GET['del'])) {
 		}else{
 
 		$delete_query = "DELETE FROM stores WHERE id = :store_id ";
-		$delete_stmt = $con->prepare($delete_query);
+		$delete_stmt = $user_db->deleteStore($delete_query);
 		$delete_stmt->bindParam(':store_id',$store_id);
 		$delete_stmt->execute();
 		header('Location: index.php');

@@ -1,5 +1,6 @@
 <?php $title= "Login Page"; ?>
-
+<?php require 'class.user.php'; ?>
+<?php $user = new User(); ?>
 <?php include "include/header.php"; ?>
 <style>
 	.container{
@@ -13,37 +14,11 @@ if (isset($_POST['submit']))
 	$u_email = $_POST['uemail'];
 	$u_password = $_POST['upass'];
 
-	$login_query = "SELECT * FROM users WHERE email=:u_email";
-	$statement =$con->prepare($login_query);
-	$statement->bindParam(':u_email',$u_email);
-	$statement->execute();
-			while ($row = $statement ->fetch()) {
-				$us_id = $row['id'];
-				$us_user = $row['username'];
-				$us_password = $row['password'];
-				$us_email = $row['email'];
-
-					
-						if (password_verify($u_password, $us_password)) {
-
-							$_SESSION['username'] = $us_user;
-							$_SESSION['id'] = $us_id;	
-							$_SESSION['status']	= $us_status;
-							
-//Generate a secure token using openssl_random_pseudo_bytes.
-$myToken = bin2hex(openssl_random_pseudo_bytes(24));
-//Store the token as a session variable.
-$_SESSION['token'] = $myToken;
-							header('Location: index.php');
-
-
-						} else {
-							$message = "Wrong password";
-						
-						}
-					
-			}
-
+	if($user->login($u_email,$u_password)){
+		header('Location: index.php');
+	}else{
+		$message = "Wrong password";
+	}
 }
 ?> 
 

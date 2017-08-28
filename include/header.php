@@ -1,4 +1,3 @@
-<?php require 'database/connection.php'; ?>
 <!DOCTYPE html>
 <html>
 <head>

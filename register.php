@@ -1,5 +1,6 @@
 <?php $title= "Registration Page"; ?>
-
+<?php require 'class.user.php'; ?>
+<?php $user = new User(); ?>
 <?php include "include/header.php"; ?>
 <style>
 	.container{
@@ -11,58 +12,35 @@
 
 		if (isset($_POST['register'])) {
 
-			$uname = strip_tags($_POST['uname']) ;
+			$username = strip_tags($_POST['uname']) ;
 			$email = strip_tags($_POST['uemail']) ;
-			$pword = strip_tags($_POST['upword']) ;
-			$cpword = strip_tags($_POST['c_upword']) ;
-			$status = "User";
-			if ($cpword != $pword) {
+			$password = strip_tags($_POST['upword']) ;
+			$confirm_password = strip_tags($_POST['c_upword']) ;
+			
+			if ($confirm_password != $password) {
 				$message[] = "Password and Confirm Password are not the same";		
 			}else{
 				try{
-					$query = "SELECT username,email FROM users WHERE username = :uname OR email = :email";
-					$check_stmt = $con->prepare($query);
-					$check_stmt->bindParam(':uname',$uname);
+					$check_stmt = $user->validation("SELECT username,email FROM users WHERE username = :uname OR email = :email");
+					$check_stmt->bindParam(':uname',$username);
 					$check_stmt->bindParam(':email',$email);
 					$check_stmt->execute();
 
 					$row=$check_stmt->fetch(PDO::FETCH_ASSOC);
-					if ($row['username'] == $uname) {
+					if ($row['username'] == $username) {
 						$message[] = "Sorry, Username already taken";
 					}elseif($row['email'] == $email){
 						$message[] = "Sorry,Email already used";
 					}else{
-						$u_password = password_hash($pword, PASSWORD_DEFAULT);
-			
-						try {
-							$userQuery = "INSERT INTO users (username, email, password ,status) VALUES (:username, :email, :u_password, :status)";
-
-							$statement = $con->prepare($userQuery);
-							$statement->bindParam(':username',$uname);
-							$statement->bindParam(':email',$email);
-							$statement->bindParam(':u_password',$u_password);
-							$statement->bindParam(':status',$status);
-							$statement->execute();
-
-							
-
-							 if ($statement->rowCount() == 1) {
-							 	$success_message = "Registration Successful,Click to login";
-								
-							 }
-								
-						} catch (PDOException $e) {
-							die($e->getMessage());
-						}
+						$u_password = password_hash($password, PASSWORD_DEFAULT);
+						
+						$user->register($username,$email,$u_password);
 					}
 				}catch(PDOException $e)
 				{
 
 				}
 			}
-			
-			
-			
 
 		}
 
